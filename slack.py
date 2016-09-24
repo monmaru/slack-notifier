@@ -23,15 +23,14 @@ class SlackBot(object):
             self.channel = setting['slack']['channel']
             self.data_dir = setting['data']['dir']
 
-    async def notify(self) -> None:
+    async def notify(self, target_date: datetime) -> None:
         """
         Slackに解析結果を通知する
+        :param target_date: 対象とする解析結果の日付
         """
-        yesterday = datetime.now() - timedelta(days=1)
-        common_text = '■{0}の解析結果'.format(yesterday.strftime('%Y/%m/%d'))
-
+        common_text = '■{0}の解析結果'.format(target_date.strftime('%Y/%m/%d'))
         message = MessageBuilder(self.data_dir)
-        with message.build(yesterday):
+        with message.build(target_date):
             # つぶやき数
             self.slack.chat.post_message(
                 channel=self.channel,
@@ -79,8 +78,10 @@ class SlackBot(object):
 def run() -> None:
     # noinspection PyBroadException
     try:
+        yesterday = datetime.now() - timedelta(days=1)
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(SlackBot().notify())
+        loop.run_until_complete(SlackBot().notify(yesterday))
+        loop.close()
     except:
         import traceback
         traceback.print_exc()
