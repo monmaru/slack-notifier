@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+import asyncio
 # noinspection PyPackageRequirements
 import yaml
 from slacker import Slacker
@@ -23,7 +24,7 @@ class SlackBot(object):
             self.channel = setting['slack']['channel']
             self.data_dir = setting['data']['dir']
 
-    def notify(self):
+    async def notify(self):
         """
         Slackに解析結果を通知する
         """
@@ -73,11 +74,15 @@ class SlackBot(object):
                 icon_emoji=self.ICON_EMOJI
             )
 
+            # たまにファイルアップロードがうまくいかないことがあったので、念のため別スレッドで少し待つ
+            await asyncio.sleep(5)
+
 
 def run():
     # noinspection PyBroadException
     try:
-        SlackBot().notify()
+        loop = asyncio.get_event_loop()
+        loop.run_until_complete(SlackBot().notify())
     except:
         import traceback
         traceback.print_exc()

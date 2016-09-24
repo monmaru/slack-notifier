@@ -2,7 +2,7 @@
 [tweet-analyzer](https://github.com/t-analyzers/tweet-analyzer)の分析結果をSlackに通知するツールです。  
 
 ## Requirements & Install
-- python 3.4+  
+- python 3.5+  
 ```
 pip install -r requirements.txt
 ```
