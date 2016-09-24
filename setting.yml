@@ -1,0 +1,6 @@
+---
+slack:
+  token: ''
+  channel: '#analysisresult'
+data:
+  dir: ''
