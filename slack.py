@@ -33,22 +33,20 @@ class SlackWrapper(object):
         """
         dt_str = dt.strftime('%Y-%m-%d')
         common_text = '■{0}の解析結果'.format(dt_str)
-        message = MessageBuilder(self.data_dir)
-
-        try:
-            message.build(dt)
+        with MessageBuilder(self.data_dir) as m:
+            m.build(dt)
             # つぶやき数
             self.s_bot.chat.post_message(
                 channel=self.channel,
                 text=common_text,
-                attachments=message.tweet_count_attachments,
+                attachments=m.tweet_count_attachments,
                 username=self.BOT_NAME,
                 icon_emoji=self.ICON_EMOJI
             )
 
             # つぶやき数のグラフ
             self.s_bot.files.upload(
-                message.chart_path,
+                m.chart_path,
                 title='つぶやき数の推移_{0}'.format(dt_str),
                 channels=self.channel
             )
@@ -57,14 +55,14 @@ class SlackWrapper(object):
             self.s_bot.chat.post_message(
                 channel=self.channel,
                 text=common_text,
-                attachments=message.feature_words_attachments,
+                attachments=m.feature_words_attachments,
                 username=self.BOT_NAME,
                 icon_emoji=self.ICON_EMOJI
             )
 
             # Word Cloud
             self.s_bot.files.upload(
-                message.word_cloud_path,
+                m.word_cloud_path,
                 title='Word Cloud_{0}'.format(dt_str),
                 channels=self.channel
             )
@@ -76,12 +74,10 @@ class SlackWrapper(object):
             # Webサイトへのリンク
             self.s_bot.chat.post_message(
                 channel=self.channel,
-                text=message.more_info,
+                text=m.more_info,
                 username=self.BOT_NAME,
                 icon_emoji=self.ICON_EMOJI
             )
-        finally:
-            message.close()
 
     def delete_expired_files(self, dt: datetime) -> None:
         """

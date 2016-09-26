@@ -27,6 +27,13 @@ class MessageBuilder(object):
         self._chart_path = ''
         self._word_cloud_path = ''
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if os.path.exists(self._chart_path):
+            os.remove(self._chart_path)
+
     def build(self, dt: datetime) -> None:
         """
         通知するメッセージとグラフを生成する。
@@ -47,14 +54,6 @@ class MessageBuilder(object):
             self._chart_path = self._create_chart_img(data_list=data_list)
 
         self._word_cloud_path = glob('{0}wordcloud_{1}.png'.format(self._data_dir, date_str))[0]
-
-    def close(self) -> None:
-        """
-        後始末としてtempフォルダに作成したファイルを削除する
-        オブジェクトが不要になった時点で呼び出す必要がある
-        """
-        if os.path.exists(self._chart_path):
-            os.remove(self._chart_path)
 
     def _build_tweet_count_message(self, data_list: List[Dict]) -> str:
         """
