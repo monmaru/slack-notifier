@@ -10,16 +10,15 @@ pip install -r requirements.txt
 ## Usage
 
 ### Settings
-**setting.yml**に設定を記載してください。  
-- slack  
-  - token  
-  Slack APIトークン  
-  - channel  
-  通知対象のチャンネル名  
-- data
-  - dir  
-  分析結果の出力パス  
-  ex: '/Users/hoge/t-analyzers.github.io/data/'  
+**setting.yml**に下記項目を設定してください。  
+```
+slack:
+  bot-token: 'xoxp-xxxxxxx' # BotのAPIトークン
+  user-token: 'xoxp-xxxxxxx' # ユーザーのAPIトークン
+  channel: '#analysisresult' # 通知対象のチャンネル名
+data:
+  dir: '/Users/hoge/t-analyzers.github.io/data/' # 分析結果の出力パス
+```
 
 ### Run
 分析完了後に下記コマンドを実行してください。  

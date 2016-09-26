@@ -1,6 +1,7 @@
 ---
 slack:
-  token: ''
+  bot-token: ''
+  user-token: ''
   channel: '#analysisresult'
 data:
   dir: ''

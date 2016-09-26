@@ -29,18 +29,21 @@ class MessageBuilder(object):
         self._word_cloud_path = ''
 
     @contextmanager
-    def build(self, target_date: datetime) -> None:
+    def build(self, dt: datetime) -> None:
         """
         通知するメッセージとグラフを生成する。
         各プロパティにアクセスする前にこの関数を呼び出す必要がある。
-        :param target_date: 対象とする解析結果の日付
+        :param dt: 解析結果の日付
         """
         try:
-            date_str = target_date.strftime('%Y%m%d')
+            date_str = dt.strftime('%Y%m%d')
             # 解析結果ファイルの検索
-            fw_json_path = glob('{0}feature_words_*{1}.json'.format(self._data_dir, date_str))[0]
+            # 1ファイルしかマッチしない想定
+            json_files = glob('{0}feature_words_*{1}.json'.format(self._data_dir, date_str))
+            if len(json_files) == 0:
+                raise FileNotFoundError('{0}の解析結果は見つかりませんでした。'.format(date_str))
 
-            with open(fw_json_path) as file:
+            with open(json_files[0]) as file:
                 data_list = json.load(file)
                 self._tc_message = self._build_tweet_count_message(data_list=data_list)
                 self._fw_message = self._build_feature_words_message(data_list=data_list)
