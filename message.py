@@ -1,6 +1,5 @@
 import json
 import os
-from contextlib import contextmanager
 from datetime import datetime
 from glob import glob
 from typing import Dict, List
@@ -28,33 +27,34 @@ class MessageBuilder(object):
         self._chart_path = ''
         self._word_cloud_path = ''
 
-    @contextmanager
     def build(self, dt: datetime) -> None:
         """
         通知するメッセージとグラフを生成する。
         各プロパティにアクセスする前にこの関数を呼び出す必要がある。
         :param dt: 解析結果の日付
         """
-        try:
-            date_str = dt.strftime('%Y%m%d')
-            # 解析結果ファイルの検索
-            # 1ファイルしかマッチしない想定
-            json_files = glob('{0}feature_words_*{1}.json'.format(self._data_dir, date_str))
-            if len(json_files) == 0:
-                raise FileNotFoundError('{0}の解析結果は見つかりませんでした。'.format(date_str))
+        date_str = dt.strftime('%Y%m%d')
+        # 解析結果ファイルの検索
+        # 1ファイルしかマッチしない想定
+        json_files = glob('{0}feature_words_*{1}.json'.format(self._data_dir, date_str))
+        if len(json_files) == 0:
+            raise FileNotFoundError('{0}の解析結果が見つかりませんでした。'.format(date_str))
 
-            with open(json_files[0]) as file:
-                data_list = json.load(file)
-                self._tc_message = self._build_tweet_count_message(data_list=data_list)
-                self._fw_message = self._build_feature_words_message(data_list=data_list)
-                self._chart_path = self._create_chart_img(data_list=data_list)
+        with open(json_files[0]) as file:
+            data_list = json.load(file)
+            self._tc_message = self._build_tweet_count_message(data_list=data_list)
+            self._fw_message = self._build_feature_words_message(data_list=data_list)
+            self._chart_path = self._create_chart_img(data_list=data_list)
 
-            self._word_cloud_path = glob('{0}wordcloud_{1}.png'.format(self._data_dir, date_str))[0]
-            yield
+        self._word_cloud_path = glob('{0}wordcloud_{1}.png'.format(self._data_dir, date_str))[0]
 
-        finally:
-            if os.path.exists(self._chart_path):
-                os.remove(self._chart_path)
+    def close(self) -> None:
+        """
+        後始末としてtempフォルダに作成したファイルを削除する
+        オブジェクトが不要になった時点で呼び出す必要がある
+        """
+        if os.path.exists(self._chart_path):
+            os.remove(self._chart_path)
 
     def _build_tweet_count_message(self, data_list: List[Dict]) -> str:
         """

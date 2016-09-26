@@ -34,7 +34,9 @@ class SlackWrapper(object):
         dt_str = dt.strftime('%Y-%m-%d')
         common_text = '■{0}の解析結果'.format(dt_str)
         message = MessageBuilder(self.data_dir)
-        with message.build(dt):
+
+        try:
+            message.build(dt)
             # つぶやき数
             self.s_bot.chat.post_message(
                 channel=self.channel,
@@ -78,6 +80,8 @@ class SlackWrapper(object):
                 username=self.BOT_NAME,
                 icon_emoji=self.ICON_EMOJI
             )
+        finally:
+            message.close()
 
     def delete_expired_files(self, dt: datetime) -> None:
         """
@@ -127,9 +131,8 @@ def run() -> None:
         loop.close()
 
         # 30日以上前にアップロードしたファイルは削除する。
-        # TODO 下記実装を有効化する。
-        # expired_date = datetime.now() - timedelta(days=30)
-        # slack.delete_expired_files(expired_date)
+        expired_date = datetime.now() - timedelta(days=30)
+        slack.delete_expired_files(expired_date)
     except:
         import traceback
         traceback.print_exc()
