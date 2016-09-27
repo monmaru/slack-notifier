@@ -127,8 +127,9 @@ def run() -> None:
         loop.close()
 
         # 30日以上前にアップロードしたファイルは削除する。
-        expired_date = datetime.now() - timedelta(days=30)
-        slack.delete_expired_files(expired_date)
+        # TODO: ユーザーアカウント（API Token）について調べた後、下記コメントを外して有効化する。
+        # expired_date = datetime.now() - timedelta(days=30)
+        # slack.delete_expired_files(expired_date)
     except:
         import traceback
         traceback.print_exc()
